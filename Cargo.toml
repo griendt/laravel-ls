@@ -1,0 +1,31 @@
+[package]
+name = "laravel-ls"
+version = "0.1.0"
+edition = "2024"
+repository = "https://github.com/griendt/laravel-ls"
+default-run = "server"
+
+[dependencies]
+serde = "1.0.219"
+serde_json = "1.0.140"
+tokio = { version = "1.44.1", features = [
+    "rt-multi-thread",
+    "macros",
+    "io-util",
+    "net",
+] }
+tower-lsp = "0.20.0"
+tracing-subscriber = "0.3.19"
+
+[[bin]]
+name = "client"
+path = "src/client.rs"
+
+[[bin]]
+name = "server"
+path = "src/server.rs"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
