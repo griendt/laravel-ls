@@ -5,9 +5,8 @@ use tower_lsp::{
     Client, LanguageServer, LspService, Server, async_trait,
     jsonrpc::Error,
     lsp_types::{
-        CompletionOptions, CompletionParams, CompletionResponse, ExecuteCommandOptions,
-        ExecuteCommandParams, InitializeParams, InitializeResult, InitializedParams,
-        ServerCapabilities, notification::Notification,
+        CompletionOptions, CompletionParams, CompletionResponse, ExecuteCommandOptions, ExecuteCommandParams,
+        InitializeParams, InitializeResult, InitializedParams, ServerCapabilities, notification::Notification,
     },
 };
 
@@ -60,10 +59,7 @@ impl LanguageServer for Backend {
         Ok(())
     }
 
-    async fn completion(
-        &self,
-        params: CompletionParams,
-    ) -> Result<Option<CompletionResponse>, Error> {
+    async fn completion(&self, params: CompletionParams) -> Result<Option<CompletionResponse>, Error> {
         println!("Asked for completions!! Params were {:?}", params);
         Ok(Some(CompletionResponse::Array(vec![])))
     }
@@ -86,7 +82,7 @@ impl LanguageServer for Backend {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Error> {
     tracing_subscriber::fmt().init();
 
     let listener = TcpListener::bind("127.0.0.1:8080").await.unwrap();
@@ -96,4 +92,6 @@ async fn main() {
     let (service, socket) = LspService::new(|client| Backend { client });
 
     Server::new(input, output, socket).serve(service).await;
+
+    Ok(())
 }
