@@ -5,7 +5,8 @@ use tower_lsp::{
     Client, LanguageServer, LspService, Server, async_trait,
     jsonrpc::Error,
     lsp_types::{
-        ExecuteCommandOptions, ExecuteCommandParams, InitializeParams, InitializeResult,
+        CompletionOptions, CompletionParams, CompletionResponse, ExecuteCommandOptions,
+        ExecuteCommandParams, InitializeParams, InitializeResult, InitializedParams,
         ServerCapabilities, notification::Notification,
     },
 };
@@ -36,6 +37,11 @@ impl LanguageServer for Backend {
         Ok(InitializeResult {
             server_info: None,
             capabilities: ServerCapabilities {
+                completion_provider: Some(CompletionOptions {
+                    resolve_provider: Some(true),
+                    trigger_characters: Some(vec![".".to_string()]),
+                    ..CompletionOptions::default()
+                }),
                 execute_command_provider: Some(ExecuteCommandOptions {
                     commands: vec![String::from("custom.notification")],
                     work_done_progress_options: Default::default(),
@@ -46,8 +52,20 @@ impl LanguageServer for Backend {
         })
     }
 
+    async fn initialized(&self, _params: InitializedParams) {
+        println!("Initialization successful!");
+    }
+
     async fn shutdown(&self) -> Result<(), Error> {
         Ok(())
+    }
+
+    async fn completion(
+        &self,
+        params: CompletionParams,
+    ) -> Result<Option<CompletionResponse>, Error> {
+        println!("Asked for completions!! Params were {:?}", params);
+        Ok(Some(CompletionResponse::Array(vec![])))
     }
 
     async fn execute_command(&self, params: ExecuteCommandParams) -> Result<Option<Value>, Error> {
